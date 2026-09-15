@@ -74,7 +74,7 @@ a {
 }
 
 .panel {
-  width: min(100%, 480px);
+  width: min(100%, 680px);
   padding: 32px;
   border-radius: 16px;
   background: var(--panel);
@@ -266,6 +266,105 @@ h1 {
     monospace;
   font-size: 12px;
   line-height: 1.5;
+}
+
+.scope-tests {
+  margin-top: 28px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.section-heading p,
+.scope-note {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.scope-list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scope-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.scope-list li > span:first-child {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.scope-list code {
+  font-size: 12px;
+}
+
+.scope-list small {
+  color: var(--muted);
+}
+
+.scope-button {
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.scope-button:hover:not(:disabled) {
+  background: var(--background);
+}
+
+.scope-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.scope-result {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.scope-list output {
+  font-size: 12px;
+}
+
+.scope-result pre {
+  max-height: 180px;
+  margin: 8px 0 0;
+  overflow: auto;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--background);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.scope-pass {
+  color: var(--success);
+}
+
+.scope-fail {
+  color: var(--danger);
 }
 
 @media (max-width: 520px) {

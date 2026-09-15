@@ -59,6 +59,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       token.idToken,
       getCookieOptions(Math.min(token.expiresIn, 300)),
     );
+    response.cookies.set(
+      AUTH_COOKIE_NAMES.accessToken,
+      token.accessToken,
+      getCookieOptions(token.expiresIn),
+    );
+    response.cookies.set(
+      AUTH_COOKIE_NAMES.scopes,
+      token.scopes,
+      getCookieOptions(token.expiresIn),
+    );
     return response;
   } catch {
     return failure('token_exchange');

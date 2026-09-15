@@ -9,7 +9,25 @@ export const AUTH_COOKIE_NAMES = {
   nonce: 'workbench_oidc_nonce',
   verifier: 'workbench_oidc_verifier',
   session: 'workbench_oidc_session',
+  accessToken: 'workbench_oidc_access_token',
+  scopes: 'workbench_oidc_scopes',
 } as const;
+
+export const REQUESTED_SCOPES = [
+  'openid',
+  'profile',
+  'email',
+  'chat.read',
+  'chat.write',
+  'workspaces.read',
+  'workspaces.write',
+  'tasks.read',
+  'tasks.write',
+  'memory.read',
+  'memory.write',
+  'catalog.read',
+  'credits.read',
+] as const;
 
 type OidcMetadata = {
   issuer: string;
@@ -19,8 +37,10 @@ type OidcMetadata = {
 };
 
 type TokenResponse = {
+  access_token?: unknown;
   id_token?: unknown;
   expires_in?: unknown;
+  scope?: unknown;
 };
 
 function requiredEnv(name: string): string {
@@ -115,7 +135,7 @@ export async function createAuthorizationRequest(): Promise<{
     new URL('/api/auth/callback', getAppUrl()).toString(),
   );
   url.searchParams.set('response_type', 'code');
-  url.searchParams.set('scope', 'openid profile email');
+  url.searchParams.set('scope', REQUESTED_SCOPES.join(' '));
   url.searchParams.set('state', state);
   url.searchParams.set('nonce', nonce);
   url.searchParams.set('code_challenge', challenge);
@@ -126,7 +146,12 @@ export async function createAuthorizationRequest(): Promise<{
 export async function exchangeAuthorizationCode(
   code: string,
   verifier: string,
-): Promise<{ idToken: string; expiresIn: number }> {
+): Promise<{
+  accessToken: string;
+  idToken: string;
+  expiresIn: number;
+  scopes: string;
+}> {
   const metadata = await getOidcMetadata();
   const response = await fetch(metadata.token_endpoint, {
     method: 'POST',
@@ -143,10 +168,16 @@ export async function exchangeAuthorizationCode(
     signal: AbortSignal.timeout(5000),
   });
   const body = (await response.json()) as TokenResponse;
-  if (!response.ok || typeof body.id_token !== 'string') {
+  if (
+    !response.ok ||
+    typeof body.access_token !== 'string' ||
+    typeof body.id_token !== 'string' ||
+    typeof body.scope !== 'string'
+  ) {
     throw new Error('Workbench token exchange failed');
   }
   return {
+    accessToken: body.access_token,
     idToken: body.id_token,
     expiresIn:
       typeof body.expires_in === 'number' &&
@@ -154,6 +185,7 @@ export async function exchangeAuthorizationCode(
       body.expires_in > 0
         ? Math.floor(body.expires_in)
         : 300,
+    scopes: body.scope,
   };
 }
 
@@ -192,4 +224,10 @@ export async function readSession(): Promise<JWTPayload | null> {
   } catch {
     return null;
   }
+}
+
+export async function readGrantedScopes(): Promise<string[]> {
+  const value = (await cookies()).get(AUTH_COOKIE_NAMES.scopes)?.value ?? '';
+  const allowed = new Set<string>(REQUESTED_SCOPES);
+  return value.split(' ').filter((scope) => allowed.has(scope));
 }

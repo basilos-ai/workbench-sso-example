@@ -1,4 +1,6 @@
-import { readSession } from '@/lib/oidc';
+import { readGrantedScopes, readSession } from '@/lib/oidc';
+
+import { ScopeTests } from './scope-tests';
 
 const ERROR_MESSAGES: Record<string, string> = {
   access_denied: '你已取消本次授权，可以重新发起登录。',
@@ -15,6 +17,7 @@ type HomePageProps = {
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const session = await readSession();
+  const grantedScopes = session ? await readGrantedScopes() : [];
   const errorValue = (await searchParams).error;
   const error = Array.isArray(errorValue) ? errorValue[0] : errorValue;
   const name =
@@ -78,6 +81,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 <dd>{session.iss}</dd>
               </div>
             </dl>
+
+            <ScopeTests grantedScopes={grantedScopes} />
 
             <form action="/api/auth/logout" method="post">
               <button className="button secondary" type="submit">
