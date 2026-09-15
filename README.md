@@ -9,6 +9,11 @@
 - 使用 HttpOnly Cookie 保存短时示例会话。
 - 支持授权成功、用户取消、参数错误和退出。
 
+## 注意
+
+- 192.168.10.11:3100：本机example应用地址
+- 192.168.10.11:3000：workbench后端地址
+
 ## 准备
 
 需要 Node.js 20.9 或更高版本。
@@ -16,7 +21,7 @@
 在 Workbench「开发 → OIDC 接入 → 应用管理」中新建应用：
 
 - 应用名称：`Workbench SSO Example`
-- 回调地址：`http://localhost:3100/api/auth/callback`
+- 回调地址：`http://192.168.10.11:3100/api/auth/callback`
 - 权限范围：`openid profile email`
 
 复制生成的 Client ID 和 Client Secret，然后：
@@ -26,16 +31,16 @@
 
 填写 `.env.local`：
 
-    WORKBENCH_ISSUER=http://localhost:3000
+    WORKBENCH_ISSUER=http://192.168.10.11:3000
     OIDC_CLIENT_ID=workbench_oidc_xxx
     OIDC_CLIENT_SECRET=xxx
-    APP_URL=http://localhost:3100
+    APP_URL=http://192.168.10.11:3100
 
 ## 运行
 
     npm run dev
 
-打开 `http://localhost:3100`，点击“使用 Workbench 登录”。Workbench 前端地址不需要写入示例配置，应用会使用 Discovery 返回的 `authorization_endpoint`。
+打开 `http://192.168.10.11:3100`，点击“使用 Workbench 登录”。Workbench 前端地址不需要写入示例配置，应用会使用 Discovery 返回的 `authorization_endpoint`。
 
 ## 验证场景
 
