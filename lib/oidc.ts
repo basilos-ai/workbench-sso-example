@@ -46,10 +46,12 @@ function getClientId(): string {
 }
 
 export function getCookieOptions(maxAge: number) {
+  const secure = getAppUrl().protocol === 'https:';
   return {
     httpOnly: true,
-    sameSite: 'lax' as const,
-    secure: getAppUrl().protocol === 'https:',
+    sameSite: secure ? ('none' as const) : ('lax' as const),
+    secure,
+    ...(secure ? { partitioned: true } : {}),
     path: '/',
     maxAge,
   };
